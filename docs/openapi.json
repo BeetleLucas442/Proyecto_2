@@ -1,0 +1,2054 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API de Eventos",
+    "version": "1.0.0",
+    "description": "API REST para gestionar usuarios, categorías, eventos, participantes y tickets. Corte 2. La contraseña se guarda en texto plano en este corte."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Users"
+    },
+    {
+      "name": "Categories"
+    },
+    {
+      "name": "Events"
+    },
+    {
+      "name": "Participants"
+    },
+    {
+      "name": "Tickets"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Iniciar sesión",
+        "description": "Verifica las credenciales contra la base de datos. `identifier` puede ser el email o el username.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              },
+              "example": {
+                "identifier": "ana@correo.com",
+                "password": "1234"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inicio de sesión exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                },
+                "example": {
+                  "message": "Inicio de sesión exitoso",
+                  "user": {
+                    "id": 1,
+                    "email": "ana@correo.com",
+                    "username": "ana",
+                    "phone": "3001234567"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Credenciales inválidas"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Listar usuarios",
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios (sin contraseña)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "email": "ana@correo.com",
+                    "username": "ana",
+                    "phone": "3001234567"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Crear usuario",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserInput"
+              },
+              "example": {
+                "email": "ana@correo.com",
+                "username": "ana",
+                "password": "1234",
+                "phone": "3001234567"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                },
+                "example": {
+                  "id": 1,
+                  "email": "ana@correo.com",
+                  "username": "ana",
+                  "phone": "3001234567"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con reglas de negocio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Registro duplicado (valor único ya existe)"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtener usuario",
+        "responses": {
+          "200": {
+            "description": "Usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                },
+                "example": {
+                  "id": 1,
+                  "email": "ana@correo.com",
+                  "username": "ana",
+                  "phone": "3001234567"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Usuario no encontrado"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Actualizar usuario",
+        "description": "Si no se envía `password` se conserva la actual.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateInput"
+              },
+              "example": {
+                "email": "ana@correo.com",
+                "username": "ana",
+                "phone": "3009998888"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuario actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                },
+                "example": {
+                  "id": 1,
+                  "email": "ana@correo.com",
+                  "username": "ana",
+                  "phone": "3001234567"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Usuario no encontrado"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con reglas de negocio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Registro duplicado (valor único ya existe)"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Eliminar usuario",
+        "responses": {
+          "204": {
+            "description": "Eliminado"
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Usuario no encontrado"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con reglas de negocio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "No se puede eliminar: el usuario es creador de eventos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}/tickets": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Users",
+          "Tickets"
+        ],
+        "summary": "Tickets de un usuario",
+        "responses": {
+          "200": {
+            "description": "Tickets del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ticket"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "purchased_at": "2026-10-14 10:00:00",
+                    "user_id": 1,
+                    "username": "ana",
+                    "event_id": 1,
+                    "event_title": "Concierto Rock",
+                    "event_date": "2026-12-31 20:00:00"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Usuario no encontrado"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Listar categorías",
+        "responses": {
+          "200": {
+            "description": "Lista",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "name": "Concert"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Crear categoría",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryInput"
+              },
+              "example": {
+                "name": "Festival"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Creada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                },
+                "example": {
+                  "id": 4,
+                  "name": "Festival"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con reglas de negocio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Registro duplicado (valor único ya existe)"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Obtener categoría",
+        "responses": {
+          "200": {
+            "description": "Categoría",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                },
+                "example": {
+                  "id": 1,
+                  "name": "Concert"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Categoría no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Categoría no encontrado"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Actualizar categoría",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryInput"
+              },
+              "example": {
+                "name": "Música"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Actualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                },
+                "example": {
+                  "id": 1,
+                  "name": "Música"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Categoría no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Categoría no encontrado"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con reglas de negocio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Registro duplicado (valor único ya existe)"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Eliminar categoría",
+        "responses": {
+          "204": {
+            "description": "Eliminada"
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Categoría no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Categoría no encontrado"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con reglas de negocio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "No se puede eliminar: hay eventos en esta categoría"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Listar eventos",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtra por categoría"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de eventos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "title": "Concierto Rock",
+                    "description": "Noche de rock",
+                    "event_date": "2026-12-31 20:00:00",
+                    "venue": "Movistar Arena",
+                    "address": "Cra 1 # 2-3",
+                    "creator_id": 1,
+                    "creator_username": "ana",
+                    "category_id": 1,
+                    "category_name": "Concert"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "category_id inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "category_id debe ser un entero positivo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Crear evento",
+        "description": "La fecha debe ser futura. `creator_id` y `category_id` deben existir.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventInput"
+              },
+              "example": {
+                "id": 1,
+                "title": "Concierto Rock",
+                "description": "Noche de rock",
+                "event_date": "2026-12-31T20:00:00",
+                "venue": "Movistar Arena",
+                "address": "Cra 1 # 2-3",
+                "creator_id": 1,
+                "category_id": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Evento creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                },
+                "example": {
+                  "id": 1,
+                  "title": "Concierto Rock",
+                  "description": "Noche de rock",
+                  "event_date": "2026-12-31 20:00:00",
+                  "venue": "Movistar Arena",
+                  "address": "Cra 1 # 2-3",
+                  "creator_id": 1,
+                  "creator_username": "ana",
+                  "category_id": 1,
+                  "category_name": "Concert"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Creador o categoría inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "La categoría no existe"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Obtener evento",
+        "responses": {
+          "200": {
+            "description": "Evento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                },
+                "example": {
+                  "id": 1,
+                  "title": "Concierto Rock",
+                  "description": "Noche de rock",
+                  "event_date": "2026-12-31 20:00:00",
+                  "venue": "Movistar Arena",
+                  "address": "Cra 1 # 2-3",
+                  "creator_id": 1,
+                  "creator_username": "ana",
+                  "category_id": 1,
+                  "category_name": "Concert"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Evento no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Evento no encontrado"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Actualizar evento",
+        "description": "No se puede cambiar el creador.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventUpdateInput"
+              },
+              "example": {
+                "title": "Concierto Rock II",
+                "description": "Nueva fecha",
+                "event_date": "2027-01-15T20:00:00",
+                "venue": "Movistar Arena",
+                "address": "Cra 1 # 2-3",
+                "category_id": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                },
+                "example": {
+                  "id": 1,
+                  "title": "Concierto Rock",
+                  "description": "Noche de rock",
+                  "event_date": "2026-12-31 20:00:00",
+                  "venue": "Movistar Arena",
+                  "address": "Cra 1 # 2-3",
+                  "creator_id": 1,
+                  "creator_username": "ana",
+                  "category_id": 1,
+                  "category_name": "Concert"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Evento no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Evento no encontrado"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Eliminar evento",
+        "description": "Elimina también sus participantes. Falla si ya hay tickets vendidos.",
+        "responses": {
+          "204": {
+            "description": "Eliminado"
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Evento no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Evento no encontrado"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con reglas de negocio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "No se puede eliminar: el evento ya tiene tickets vendidos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{id}/tickets": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Events",
+          "Tickets"
+        ],
+        "summary": "Tickets de un evento",
+        "responses": {
+          "200": {
+            "description": "Tickets del evento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ticket"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "purchased_at": "2026-10-14 10:00:00",
+                    "user_id": 1,
+                    "username": "ana",
+                    "event_id": 1,
+                    "event_title": "Concierto Rock",
+                    "event_date": "2026-12-31 20:00:00"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Evento no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Evento no encontrado"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{eventId}/participants": {
+      "parameters": [
+        {
+          "name": "eventId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Listar participantes de un evento",
+        "responses": {
+          "200": {
+            "description": "Lista",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Participant"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "name": "Los Rockeros",
+                    "role": "Artista principal",
+                    "event_id": 1
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Evento no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Evento no encontrado"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Agregar participante",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParticipantInput"
+              },
+              "example": {
+                "name": "Los Rockeros",
+                "role": "Artista principal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Participant"
+                },
+                "example": {
+                  "id": 1,
+                  "name": "Los Rockeros",
+                  "role": "Artista principal",
+                  "event_id": 1
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Evento no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Evento no encontrado"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{eventId}/participants/{id}": {
+      "parameters": [
+        {
+          "name": "eventId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Obtener participante",
+        "responses": {
+          "200": {
+            "description": "Participante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Participant"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Participante no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Participante no encontrado"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Actualizar participante",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParticipantInput"
+              },
+              "example": {
+                "name": "Los Rockeros",
+                "role": "Invitado"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Participant"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Participante no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Participante no encontrado"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Eliminar participante",
+        "responses": {
+          "204": {
+            "description": "Eliminado"
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Participante no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Participante no encontrado"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets": {
+      "get": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Listar tickets",
+        "responses": {
+          "200": {
+            "description": "Lista",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ticket"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "purchased_at": "2026-10-14 10:00:00",
+                    "user_id": 1,
+                    "username": "ana",
+                    "event_id": 1,
+                    "event_title": "Concierto Rock",
+                    "event_date": "2026-12-31 20:00:00"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Comprar ticket",
+        "description": "Reglas: el evento no debe haber ocurrido y un usuario solo puede tener un ticket por evento.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketInput"
+              },
+              "example": {
+                "user_id": 1,
+                "event_id": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ticket creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ticket"
+                },
+                "example": {
+                  "id": 1,
+                  "purchased_at": "2026-10-14 10:00:00",
+                  "user_id": 1,
+                  "username": "ana",
+                  "event_id": 1,
+                  "event_title": "Concierto Rock",
+                  "event_date": "2026-12-31 20:00:00"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "field": "email",
+                      "message": "email no es un correo válido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario o evento inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El evento no existe"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con reglas de negocio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El usuario ya tiene un ticket para este evento"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Obtener ticket",
+        "responses": {
+          "200": {
+            "description": "Ticket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ticket"
+                },
+                "example": {
+                  "id": 1,
+                  "purchased_at": "2026-10-14 10:00:00",
+                  "user_id": 1,
+                  "username": "ana",
+                  "event_id": 1,
+                  "event_title": "Concierto Rock",
+                  "event_date": "2026-12-31 20:00:00"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ticket no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Ticket no encontrado"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Cancelar (eliminar) ticket",
+        "responses": {
+          "204": {
+            "description": "Eliminado"
+          },
+          "400": {
+            "description": "Parámetro de ruta inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "El parámetro id debe ser un entero positivo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ticket no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Ticket no encontrado"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "LoginInput": {
+        "type": "object",
+        "required": [
+          "identifier",
+          "password"
+        ],
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "email o username"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "UserInput": {
+        "type": "object",
+        "required": [
+          "email",
+          "username",
+          "password",
+          "phone"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 255
+          },
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50
+          },
+          "password": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 255
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20
+          }
+        }
+      },
+      "UserUpdateInput": {
+        "type": "object",
+        "required": [
+          "email",
+          "username",
+          "phone"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "description": "opcional"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CategoryInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "event_date": {
+            "type": "string"
+          },
+          "venue": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "creator_id": {
+            "type": "integer"
+          },
+          "creator_username": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "category_name": {
+            "type": "string"
+          }
+        }
+      },
+      "EventInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "event_date",
+          "venue",
+          "address",
+          "creator_id",
+          "category_id"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "description": {
+            "type": "string"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "venue": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "creator_id": {
+            "type": "integer"
+          },
+          "category_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "EventUpdateInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "event_date",
+          "venue",
+          "address",
+          "category_id"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "venue": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "Participant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "event_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "ParticipantInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "role"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "role": {
+            "type": "string",
+            "maxLength": 80
+          }
+        }
+      },
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "purchased_at": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "event_id": {
+            "type": "integer"
+          },
+          "event_title": {
+            "type": "string"
+          },
+          "event_date": {
+            "type": "string"
+          }
+        }
+      },
+      "TicketInput": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "event_id"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "integer"
+          },
+          "event_id": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}
