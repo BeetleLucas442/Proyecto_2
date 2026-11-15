@@ -90,7 +90,7 @@ module.exports = {
       },
       post: {
         tags: ['Events'], summary: 'Crear evento', description: 'La fecha debe ser futura. `creator_id` y `category_id` deben existir.',
-        requestBody: body(ref('EventInput'), { id: 1, title: 'Concierto Rock', description: 'Noche de rock', event_date: '2026-12-31T20:00:00', venue: 'Movistar Arena', address: 'Cra 1 # 2-3', creator_id: 1, category_id: 1 }),
+        requestBody: body(ref('EventInput'), { title: 'Concierto Rock', description: 'Noche de rock', event_date: '2026-12-31T20:00:00', venue: 'Movistar Arena', address: 'Cra 1 # 2-3', creator_id: 1, category_id: 1 }),
         responses: { 201: ok('Evento creado', ref('Event'), eventEx), 400: R400, 404: err('Creador o categoría inexistente', 'La categoría no existe') }
       }
     },

@@ -77,7 +77,3 @@ INSERT INTO category (name) VALUES
   ('Concert'),
   ('Theater'),
   ('Sports');
-
-CREATE USER 'nyxa_user'@'localhost' IDENTIFIED BY 'Clave1234';
-GRANT ALL PRIVILEGES ON nyxa.* TO 'nyxa_user'@'localhost';
-FLUSH PRIVILEGES;
