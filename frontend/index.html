@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nyxa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="no-shell">
+  <div id="loader"><div class="logo big">nyxa</div><div class="dots"><i></i><i></i><i></i><i></i></div></div>
+  <header id="top">
+    <button id="btn-menu" aria-label="Menú">☰</button>
+    <button id="btn-home" data-go="#/home" aria-label="Inicio">✦</button>
+    <button id="btn-avatar" class="avatar" data-go="#/profile" aria-label="Perfil">👤</button>
+  </header>
+  <div id="overlay"></div>
+  <aside id="menu">
+    <div class="menu-head"><span class="logo" data-go="#/home" aria-label="Ir al inicio">nyxa</span><button id="btn-close">☰</button></div>
+    <nav>
+      <a data-go="#/home"><span>🏠</span>Inicio</a>
+      <a data-go="#/profile"><span>👤</span>Usuario</a>
+      <a data-go="#/attended"><span>📁</span>Eventos a los que fuiste</a>
+      <a data-go="#/my-events"><span>🏅</span>Tus próximos eventos</a>
+      <a data-go="#/category/theater"><span>🎭</span>Obra de teatro</a>
+      <a data-go="#/category/sports"><span>🏀</span>Eventos deportivos</a>
+      <a data-go="#/category/concert"><span>🎸</span>Conciertos</a>
+      <a class="admin-only" data-go="#/create"><span>➕</span>Crear nuevo evento</a>
+    </nav>
+    <a class="menu-foot" data-go="#/settings"><span>⚙️</span>Ajustes</a>
+    <a class="menu-foot out" id="btn-logout"><span>🚪</span>Cerrar sesión</a>
+  </aside>
+  <main id="view"></main>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
