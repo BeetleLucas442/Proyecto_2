@@ -23,7 +23,7 @@ module.exports = {
   info: {
     title: 'API de Eventos',
     version: '1.0.0',
-    description: 'API REST para gestionar usuarios, categorías, eventos, participantes y tickets. Corte 2. La contraseña se guarda en texto plano en este corte.'
+    description: 'API REST para gestionar usuarios, categorías, eventos, participantes y tickets. Corte 3. Las contraseñas se almacenan como hash bcrypt con salt; nunca se guardan ni se devuelven en texto plano.'
   },
   servers: [{ url: 'http://localhost:3000/api' }],
   tags: ['Auth', 'Users', 'Categories', 'Events', 'Participants', 'Tickets'].map((name) => ({ name })),
@@ -31,7 +31,7 @@ module.exports = {
     '/auth/login': {
       post: {
         tags: ['Auth'], summary: 'Iniciar sesión',
-        description: 'Verifica las credenciales contra la base de datos. `identifier` puede ser el email o el username.',
+        description: 'Verifica las credenciales contra la base de datos. `identifier` puede ser el email o el username. La contraseña recibida se compara con el hash bcrypt almacenado.',
         requestBody: body(ref('LoginInput'), { identifier: 'ana@correo.com', password: '1234' }),
         responses: {
           200: ok('Inicio de sesión exitoso', ref('LoginResponse'), { message: 'Inicio de sesión exitoso', user: userEx }),
